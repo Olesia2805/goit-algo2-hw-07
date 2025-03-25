@@ -1,6 +1,6 @@
 from functools import lru_cache
 from timeit import timeit
-import matplotlib
+import matplotlib.pyplot as plt
 
 
 class Node:
@@ -16,8 +16,7 @@ class SplayTree:
         self.root = None
 
     def insert(self, data):
-        """Inssert the new element into the tree."""
-
+        """Insert the new element into the tree."""
         if self.find(data) is not None:
             return
 
@@ -49,11 +48,11 @@ class SplayTree:
                 node = node.right_node
             else:
                 self._splay(node)
-                return node.data
+                return node  # Return the node itself
         return None  # If the element is not found
 
     def _splay(self, node):
-        """Realizations of splaying to move the node to the root."""
+        """Splaying to move the node to the root."""
         while node.parent is not None:
             if node.parent.parent is None:  # Zig-case
                 if node == node.parent.left_node:
@@ -126,8 +125,9 @@ class SplayTree:
 def fibonacci_splay(n, tree):
     if n < 2:
         return n
-    if tree.find(n) is not None:
-        return tree.find(n)
+    node = tree.find(n)
+    if node:
+        return node.data
     else:
         result = fibonacci_splay(n - 1, tree) + fibonacci_splay(n - 2, tree)
         tree.insert(n)
@@ -145,8 +145,28 @@ if __name__ == "__main__":
     tree = SplayTree()
 
     print(f"|{'n':^15}|" f"{'LRU Cache Time (s)':^30}|{'Splay Tree Time (s)':^30}|")
-    print("-" * 80)
+    print(f"|:{'-' * 13}:|" f":{'-' * 28}:|:{'-' * 28}:|")
+
+    times_values = []
+    lru_times = []
+    splay_times = []
+
     for times in range(0, 950 + 1, 50):
         lru_time = round(timeit(lambda: fibonacci_lru(times)), 10)
         splay_time = round(timeit(lambda: fibonacci_splay(times, tree)), 10)
+
         print(f"|{times:^15}|{lru_time:^30}|{splay_time:^30}|")
+
+        times_values.append(times)
+        lru_times.append(lru_time)
+        splay_times.append(splay_time)
+
+    plt.plot(times_values, lru_times, "bo-", label="LRU Cache Fibonacci")
+    plt.plot(times_values, splay_times, "rx-", label="Splay Tree Fibonacci")
+
+    plt.xlabel("Fibonacci Number (n)")
+    plt.ylabel("Execution Time (seconds)")
+    plt.title("Performance of Fibonacci Implementations")
+    plt.legend()
+
+    plt.show()
