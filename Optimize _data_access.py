@@ -97,7 +97,7 @@ def range_sum_with_cache(array, L, R):
     if (L, R) in cache.cache:
         return cache.get((L, R))
     result = sum(array[L : R + 1])
-    cache.put((L, R), result)
+    cache.put(tuple([L, R]), result)
     return result
 
 
@@ -111,32 +111,40 @@ if __name__ == "__main__":
     Q = 50000
 
     array = [random.randint(1, 100) for _ in range(N)]
+
     queries = [
         (
-            query_type := random.choice(["Range", "Update"]),
-            L := random.randint(0, N - 1),
-            R := (
-                random.randint(L, N - 1)
-                if query_type == "Range"
-                else random.randint(0, N - 1)
-            ),
+            {
+                "type": (query_type := random.choice(["Range", "Update"])),
+                "L": (L := random.randint(0, N - 1)),
+                "R": (
+                    random.randint(L, N - 1)
+                    if query_type == "Range"
+                    else random.randint(0, N - 1)
+                ),
+            }
         )
         for _ in range(Q)
     ]
 
-    # for i in range(Q):
-    #     if queries[i][0] == "Range":
-    #         L, R = queries[i][1], queries[i][2]
-    #         if L > R:
-    #             L, R = R, L
-    #         range_sum_no_cache(array, L, R)
-    #     else:
-    #         index, value = queries[i][1], queries[i][2]
-    #         update_no_cache(array, index, value)
     start_time_no_cache = time.time()
+    for i in range(Q):
+        if queries[i]["type"] == "Range":
+            L, R = queries[i]["L"], queries[i]["R"]
+            range_sum_no_cache(array, L, R)
+        else:
+            index, value = queries[i]["L"], queries[i]["R"]
+            update_no_cache(array, index, value)
     time_no_cache = time.time() - start_time_no_cache
 
     start_time_with_cache = time.time()
+    for i in range(Q):
+        if queries[i]["type"] == "Range":
+            L, R = queries[i]["L"], queries[i]["R"]
+            range_sum_with_cache(array, L, R)
+        else:
+            index, value = queries[i]["L"], queries[i]["R"]
+            update_with_cache(array, index, value)
     time_with_cache = time.time() - start_time_with_cache
 
     print(f"Time without cache: {time_no_cache:.2f} s")
