@@ -1,5 +1,5 @@
 import random
-from timeit import timeit
+import time
 
 
 class Node:
@@ -85,10 +85,8 @@ cache = LRUCache(1000)
 
 
 def range_sum_no_cache(array, L, R):
-    sum = 0
-    for i in range(L, R + 1):
-        sum += array[i]
-    return sum
+    result = sum(array[L : R + 1])
+    return result
 
 
 def update_no_cache(array, index, value):
@@ -96,23 +94,50 @@ def update_no_cache(array, index, value):
 
 
 def range_sum_with_cache(array, L, R):
-    pass
+    if (L, R) in cache.cache:
+        return cache.get((L, R))
+    result = sum(array[L : R + 1])
+    cache.put((L, R), result)
+    return result
 
 
 def update_with_cache(array, index, value):
     array[index] = value
-    range_sum_with_cache.cache_clear()
+    cache.clear()
 
 
 if __name__ == "__main__":
+    N = 100000
+    Q = 50000
 
-    array = [random.randint(1, 100) for _ in range(100000)]
-    time_no_cache = round(
-        timeit(lambda: range_sum_no_cache(array, 0, 99999), number=1000), 10
-    )
-    time_with_cache = round(
-        timeit(lambda: range_sum_with_cache(array, 0, 99999), number=1000), 10
-    )
+    array = [random.randint(1, 100) for _ in range(N)]
+    queries = [
+        (
+            query_type := random.choice(["Range", "Update"]),
+            L := random.randint(0, N - 1),
+            R := (
+                random.randint(L, N - 1)
+                if query_type == "Range"
+                else random.randint(0, N - 1)
+            ),
+        )
+        for _ in range(Q)
+    ]
 
-    print(f"Time without cache: {time_no_cache:.2f} sec")
-    print(f"Time with cache: {time_with_cache:.2f} sec")
+    # for i in range(Q):
+    #     if queries[i][0] == "Range":
+    #         L, R = queries[i][1], queries[i][2]
+    #         if L > R:
+    #             L, R = R, L
+    #         range_sum_no_cache(array, L, R)
+    #     else:
+    #         index, value = queries[i][1], queries[i][2]
+    #         update_no_cache(array, index, value)
+    start_time_no_cache = time.time()
+    time_no_cache = time.time() - start_time_no_cache
+
+    start_time_with_cache = time.time()
+    time_with_cache = time.time() - start_time_with_cache
+
+    print(f"Time without cache: {time_no_cache:.2f} s")
+    print(f"Time with cache: {time_with_cache:.2f} s")
