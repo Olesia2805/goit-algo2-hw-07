@@ -1,16 +1,30 @@
 # Results
 
+## No caching vs Cache
+
+`Time without cache: 10.17 s` ***VS*** `Time with cache: 16.09 s`
+
+The main reason that `Time with cache` is higher than `Time without cache` in our case is that since the **cache size is relatively small** and **the queries are random** and **have non-overlapping ranges**, the cache does not provide enough efficiency gains to compensate for the overhead, making it slower than performing operations without caching.
+
+- Each time you perform an operation, the system must check if the result is already in the cache, and then either fetch it from the cache or calculate and store the result.
+
+    - A lot of unique queries with non-overlapping ranges lead to repeated cache misses, which makes the benefit of caching less noticeable.
+
+- The logic of the LRU cache involves moving items in a linked list and maintaining the state of the cache. Operations such as moving items to the foreground or removing the least used items increase the time complexity.
+    
+    - If you perform a large number of operations, the cache pushes out items, which leads to inefficient use of the cache and an increase in the rate of displacement.
+
 ## LRU Cache vs Splay Tree
 
-The graph shows that the execution time for LRU Cache is much shorter than for Splay Tree.
+The graph shows that the execution time for `LRU Cache` is much shorter than for `Splay Tree`.
 
-**LRU Cache** provides O(1) access to stored values. @lru_cache efficiently caches already calculated values, which avoids unnecessary recursive calls.
+`LRU Cache` provides O(1) access to stored values. @lru_cache efficiently caches already calculated values, which avoids unnecessary recursive calls.
 
-**Splay Tree** is more expensive because each request requires reorganizing the tree, which adds overhead. This is due to additional insertion and search operations in Splay Tree, which in the worst case have a complexity of O(log n).
+`Splay Tree` is more expensive because each request requires reorganizing the tree, which adds overhead. This is due to additional insertion and search operations in Splay Tree, which in the worst case have a complexity of O(log n).
 
 ![Performance of Fibonacci Implementations](Performance_of_Fibonacci_Implementations.png)
 
-|       n       |      LRU Cache Time (s)      |     Splay Tree Time (s)      |
+|       n       |      `LRU Cache Time (s)`      |     `Splay Tree Time (s)`      |
 |:-------------:|:----------------------------:|:----------------------------:|
 |       0       |          0.0982683           |          0.0971793           |
 |      50       |          0.0907925           |          0.2378156           |
