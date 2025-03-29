@@ -127,6 +127,10 @@ if __name__ == "__main__":
         for _ in range(Q)
     ]
 
+    print("Starting performance test...")
+    print("---")
+    print(f"Sample queries: {queries[:5]}")
+
     start_time_no_cache = time.time()
     for i in range(Q):
         if queries[i]["type"] == "Range":
@@ -147,5 +151,6 @@ if __name__ == "__main__":
             update_with_cache(array, index, value)
     time_with_cache = time.time() - start_time_with_cache
 
+    print("---")
     print(f"Time without cache: {time_no_cache:.2f} s")
     print(f"Time with cache: {time_with_cache:.2f} s")
